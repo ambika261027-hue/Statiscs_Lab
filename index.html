@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discrete Probability Distributions - AIML Laboratory</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #475569;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #0ea5e9;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5r em;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--secondary);
+            cursor: pointer;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        nav button:hover {
+            background-color: var(--bg-color);
+            color: var(--primary);
+        }
+
+        nav button.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Main Content Layout */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography & Headings */
+        h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-main); }
+        h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main); }
+        h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-main); }
+        p { margin-bottom: 1rem; color: var(--text-muted); }
+
+        /* Cards & Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 0.25rem;
+        }
+
+        .stat-formula {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Form Controls */
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            color: var(--text-main);
+        }
+
+        input[type="number"], select, textarea {
+            width: 100%;
+            padding: 0.65rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            background-color: #fff;
+            color: var(--text-main);
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-msg.visible {
+            display: block;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.65rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn:active { transform: scale(0.98); }
+
+        /* Visualization & Charts */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        svg.chart {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+            padding: 0.4rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2);
+        }
+
+        /* Home Page Dashboard Cards */
+        .module-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .module-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        .module-card h3 { color: var(--primary); font-size: 1.4rem; }
+
+        /* Explanation Boxes */
+        .explanation-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container { padding: 1rem; flex-direction: column; align-items: flex-start; }
+            nav ul { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header & Navigation -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">
+                <span>AIML Lab: Discrete Probability Distributions</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><button class="nav-btn active" data-target="home-view">Home</button></li>
+                    <li><button class="nav-btn" data-target="binomial-view">Binomial</button></li>
+                    <li><button class="nav-btn" data-target="poisson-view">Poisson</button></li>
+                    <li><button class="nav-btn" data-target="geometric-view">Geometric</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main>
+        <!-- HOME VIEW -->
+        <section id="home-view" class="view-section active">
+            <h1>Discrete Probability Distributions</h1>
+            <p>Welcome to the interactive Artificial Intelligence and Machine Learning (AIML) laboratory module dedicated to discrete probability distributions. In probabilistic modeling and statistical machine learning, understanding discrete random variables is fundamental for classification algorithms, probabilistic reasoning, language modeling, and stochastic processes.</p>
+            
+            <div class="explanation-box">
+                <strong>How to use this lab:</strong> Select any module from the navigation bar above or via the cards below. You can dynamically adjust distribution parameters, compute exact PMF values and cumulative probabilities (CDF), visualize interactive bar charts featuring expected value markers, and complete guided laboratory exercises.
+            </div>
+
+            <div class="module-cards">
+                <div class="module-card">
+                    <div>
+                        <h3>Binomial Distribution</h3>
+                        <p>Models the number of successes in a fixed number of independent binary trials (e.g., coin flips, binary classification correctness).</p>
+                    </div>
+                    <button class="btn" onclick="switchView('binomial-view')">Open Binomial Module</button>
+                </div>
+                <div class="module-card">
+                    <div>
+                        <h3>Poisson Distribution</h3>
+                        <p>Models the count of independent events occurring within a fixed interval of time or space at a constant average rate.</p>
+                    </div>
+                    <button class="btn" onclick="switchView('poisson-view')">Open Poisson Module</button>
+                </div>
+                <div class="module-card">
+                    <div>
+                        <h3>Geometric Distribution</h3>
+                        <p>Models the number of independent Bernoulli trials required to achieve the very first success.</p>
+                    </div>
+                    <button class="btn" onclick="switchView('geometric-view')">Open Geometric Module</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- BINOMIAL VIEW -->
+        <section id="binomial-view" class="view-section">
+            <h1>Binomial Distribution Module</h1>
+            <p>Model the number of successes $X \sim \text{Binomial}(n, p)$ in $n$ independent trials with success probability $p$.</p>
+
+            <div class="grid-2">
+                <!-- Controls & Overview -->
+                <div class="card">
+                    <h3>Parameter Controls</h3>
+                    <div class="input-group">
+                        <label for="binom-n">Number of trials (n):</label>
+                        <input type="number" id="binom-n" value="20" min="1" max="200" step="1">
+                        <div id="binom-n-error" class="error-msg">Please enter a valid positive integer (n &le; 200).</div>
+                    </div>
+                    <div class="input-group">
+                        <label for="binom-p">Probability of success (p):</label>
+                        <input type="number" id="binom-p" value="0.35" min="0" max="1" step="0.01">
+                        <div id="binom-p-error" class="error-msg">Please enter a probability between 0 and 1 inclusive.</div>
+                    </div>
+                    <div class="explanation-box" id="binom-param-summary">
+                        Selected: n = 20, p = 0.35, 1-p = 0.65
+                    </div>
+
+                    <h3>Calculators</h3>
+                    <div class="input-group">
+                        <label for="binom-k">PMF Exact Successes (k):</label>
+                        <input type="number" id="binom-k" value="7" min="0" step="1">
+                        <div id="binom-k-error" class="error-msg">k must be an integer between 0 and n.</div>
+                    </div>
+                    <div id="binom-pmf-result" class="explanation-box" style="margin-bottom: 0.75rem;">
+                        P(X = 7) = 0.1601 (16.01%)
+                    </div>
+
+                    <div class="input-group" style="margin-top: 1rem;">
+                        <label for="binom-cdf-k">CDF Cumulative Limit (k):</label>
+                        <input type="number" id="binom-cdf-k" value="7" min="0" step="1">
+                        <div id="binom-cdf-k-error" class="error-msg">k must be an integer between 0 and n.</div>
+                    </div>
+                    <div id="binom-cdf-result" class="explanation-box">
+                        P(X &le; 7) = 0.5843 | P(X &gt; 7) = 0.4157
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div>
+                    <div class="grid-2" style="margin-bottom: 0;">
+                        <div class="card stat-card">
+                            <label>Mean E[X]</label>
+                            <div class="stat-formula">np</div>
+                            <div class="stat-value" id="binom-stat-mean">7.0000</div>
+                        </div>
+                        <div class="card stat-card">
+                            <label>Variance Var(X)</label>
+                            <div class="stat-formula">np(1-p)</div>
+                            <div class="stat-value" id="binom-stat-var">4.5500</div>
+                        </div>
+                    </div>
+                    <div class="grid-2" style="margin-top: 1rem; margin-bottom: 0;">
+                        <div class="card stat-card">
+                            <label>Standard Deviation (&sigma;)</label>
+                            <div class="stat-formula">&radic;[np(1-p)]</div>
+                            <div class="stat-value" id="binom-stat-std">2.1331</div>
+                        </div>
+                        <div class="card stat-card">
+                            <label>Second Moment E[X&sup2;]</label>
+                            <div class="stat-formula">Var(X) + (E[X])&sup2;</div>
+                            <div class="stat-value" id="binom-stat-m2">53.5500</div>
+                        </div>
+                    </div>
+                    <div class="card stat-card" style="margin-top: 1rem;">
+                        <label>Skewness (&gamma;&sub1;)</label>
+                        <div class="stat-formula">(1-2p) / &radic;[np(1-p)]</div>
+                        <div class="stat-value" id="binom-stat-skew">0.1404</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph Container -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3>Binomial PMF Visualization & Mean Reference</h3>
+                <p>Probability Mass Function across all possible success counts X from 0 to n. The dashed vertical line indicates the theoretical mean.</p>
+                <div class="chart-container" id="binom-chart-container">
+                    <svg class="chart" id="binom-svg"></svg>
+                    <div class="tooltip" id="binom-tooltip"></div>
+                </div>
+            </div>
+
+            <!-- Laboratory Exercise 1 -->
+            <div class="card" style="margin-top: 1.5rem; border-left: 4px solid var(--success);">
+                <h3>Laboratory Exercise 1: Binomial Analysis</h3>
+                <p>Test your understanding using guided parameters and verify calculations.</p>
+                <button class="btn" id="load-ex1-btn" style="margin-bottom: 1rem;">Load Exercise 1 Values (n = 15, p = 0.6)</button>
+                
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li><strong>Q1 Mean & Variance:</strong> Expected Mean = 9, Variance = 3.6.</li>
+                    <li><strong>Q2 Exact Probability:</strong> P(X = 9) &approx; 0.2066.</li>
+                    <li><strong>Q3 Cumulative Probability:</strong> P(X &le; 10) &approx; 0.7869.</li>
+                    <li><strong>Q4 Highest Probability Region:</strong> Mode occurs at X = 9.</li>
+                </ul>
+
+                <div class="input-group">
+                    <label for="binom-inference"><strong>Q5 Student Inference / Observations:</strong></label>
+                    <textarea id="binom-inference" rows="3" placeholder="Enter your observations regarding distribution symmetry, skewness, or mode here...">For 15 independent trials with a success probability of 0.6, the expected number of successes is 9. The highest probability occurs at 9 successes, and the probabilities decrease toward the extreme outcomes.</textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- POISSON VIEW -->
+        <section id="poisson-view" class="view-section">
+            <h1>Poisson Distribution Module</h1>
+            <p>Model the number of discrete events $X \sim \text{Poisson}(\lambda)$ occurring in a fixed interval with average rate $\lambda$.</p>
+
+            <div class="grid-2">
+                <!-- Controls & Overview -->
+                <div class="card">
+                    <h3>Parameter Controls</h3>
+                    <div class="input-group">
+                        <label for="poisson-lambda">Average number of events (&lambda;):</label>
+                        <input type="number" id="poisson-lambda" value="6" min="0" max="100" step="0.1">
+                        <div id="poisson-lambda-error" class="error-msg">Please enter a non-negative number (&lambda; &ge; 0).</div>
+                    </div>
+
+                    <h3>Calculators</h3>
+                    <div class="input-group">
+                        <label for="poisson-k">PMF Exact Events (k):</label>
+                        <input type="number" id="poisson-k" value="6" min="0" step="1">
+                        <div id="poisson-k-error" class="error-msg">k must be a non-negative integer.</div>
+                    </div>
+                    <div id="poisson-pmf-result" class="explanation-box" style="margin-bottom: 0.75rem;">
+                        P(X = 6) = 0.1606 (16.06%)
+                    </div>
+
+                    <div class="input-group" style="margin-top: 1rem;">
+                        <label for="poisson-cdf-k">CDF Cumulative Limit (k):</label>
+                        <input type="number" id="poisson-cdf-k" value="6" min="0" step="1">
+                        <div id="poisson-cdf-k-error" class="error-msg">k must be a non-negative integer.</div>
+                    </div>
+                    <div id="poisson-cdf-result" class="explanation-box">
+                        P(X &le; 6) = 0.6063 | P(X &gt; 6) = 0.3937
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div>
+                    <div class="grid-2" style="margin-bottom: 0;">
+                        <div class="card stat-card">
+                            <label>Mean E[X]</label>
+                            <div class="stat-formula">&lambda;</div>
+                            <div class="stat-value" id="poisson-stat-mean">6.0000</div>
+                        </div>
+                        <div class="card stat-card">
+                            <label>Variance Var(X)</label>
+                            <div class="stat-formula">&lambda;</div>
+                            <div class="stat-value" id="poisson-stat-var">6.0000</div>
+                        </div>
+                    </div>
+                    <div class="card stat-card" style="margin-top: 1rem;">
+                        <label>Standard Deviation (&sigma;)</label>
+                        <div class="stat-formula">&radic;&lambda;</div>
+                        <div class="stat-value" id="poisson-stat-std">2.4495</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph Container -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3>Poisson PMF Visualization & Mean Reference</h3>
+                <p>Probability Mass Function across event counts. The dashed vertical line marks the mean rate &lambda;.</p>
+                <div class="chart-container" id="poisson-chart-container">
+                    <svg class="chart" id="poisson-svg"></svg>
+                    <div class="tooltip" id="poisson-tooltip"></div>
+                </div>
+            </div>
+
+            <!-- Comparison Section for Poisson -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3>Poisson Rate Parameter Comparison (&lambda; = 2, 6, 10)</h3>
+                <p>Observe how varying the arrival rate shifts the distribution center, increases spread, and reduces relative right skewness.</p>
+                <div class="chart-container" id="poisson-comp-container">
+                    <svg class="chart" id="poisson-comp-svg"></svg>
+                    <div class="tooltip" id="poisson-comp-tooltip"></div>
+                </div>
+            </div>
+
+            <!-- Laboratory Exercise 2 -->
+            <div class="card" style="margin-top: 1.5rem; border-left: 4px solid var(--success);">
+                <h3>Laboratory Exercise 2: Poisson Analysis</h3>
+                <p>Context: An AI monitoring system records events with an average rate of 6 events per interval.</p>
+                <button class="btn" id="load-ex2-btn" style="margin-bottom: 1rem;">Load Exercise 2 Values (&lambda; = 6)</button>
+                
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li><strong>Q1 Mean & Variance:</strong> Mean = 6, Variance = 6.</li>
+                    <li><strong>Q2 Exact Probability (k = 8):</strong> P(X = 8) &approx; 0.1033.</li>
+                    <li><strong>Q3 Cumulative Probability (k = 5):</strong> P(X &le; 5) &approx; 0.4457.</li>
+                    <li><strong>Q4 Parameter Comparison:</strong> Analyzed across &lambda; = 2, 6, 10.</li>
+                </ul>
+
+                <div class="input-group">
+                    <label for="poisson-inference"><strong>Q5 Student Inference / Observations:</strong></label>
+                    <textarea id="poisson-inference" rows="3" placeholder="Enter inference notes here...">As &lambda; increases from 2 to 6 to 10, the distribution shifts toward larger event counts and its absolute spread increases. The distribution also becomes relatively less right-skewed.</textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- GEOMETRIC VIEW -->
+        <section id="geometric-view" class="view-section">
+            <h1>Geometric Distribution Module</h1>
+            <p>Model the number of trials $X \sim \text{Geometric}(p)$ required to achieve the first success, where success probability is $p$ ($0 < p \le 1$).</p>
+
+            <div class="grid-2">
+                <!-- Controls & Overview -->
+                <div class="card">
+                    <h3>Parameter Controls</h3>
+                    <div class="input-group">
+                        <label for="geom-p">Probability of success (p):</label>
+                        <input type="number" id="geom-p" value="0.5" min="0.001" max="1" step="0.01">
+                        <div id="geom-p-error" class="error-msg">Please enter a probability strictly between 0 and 1 inclusive (0 &lt; p &le; 1).</div>
+                    </div>
+                    <div class="explanation-box" id="geom-param-summary">
+                        Selected: p = 0.5, 1-p = 0.5
+                    </div>
+
+                    <h3>Calculators</h3>
+                    <div class="input-group">
+                        <label for="geom-k">PMF Exact Trial on k:</label>
+                        <input type="number" id="geom-k" value="3" min="1" step="1">
+                        <div id="geom-k-error" class="error-msg">k must be a positive integer (k &ge; 1).</div>
+                    </div>
+                    <div id="geom-pmf-result" class="explanation-box" style="margin-bottom: 0.75rem;">
+                        P(X = 3) = 0.1250 (12.50%)
+                    </div>
+
+                    <div class="input-group" style="margin-top: 1rem;">
+                        <label for="geom-cdf-k">CDF Cumulative Limit (k):</label>
+                        <input type="number" id="geom-cdf-k" value="3" min="1" step="1">
+                        <div id="geom-cdf-k-error" class="error-msg">k must be a positive integer (k &ge; 1).</div>
+                    </div>
+                    <div id="geom-cdf-result" class="explanation-box">
+                        P(X &le; 3) = 0.8750 | P(X &gt; 3) = 0.1250
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div>
+                    <div class="grid-2" style="margin-bottom: 0;">
+                        <div class="card stat-card">
+                            <label>Mean E[X]</label>
+                            <div class="stat-formula">1 / p</div>
+                            <div class="stat-value" id="geom-stat-mean">2.0000</div>
+                        </div>
+                        <div class="card stat-card">
+                            <label>Variance Var(X)</label>
+                            <div class="stat-formula">(1-p) / p&sup2;</div>
+                            <div class="stat-value" id="geom-stat-var">2.0000</div>
+                        </div>
+                    </div>
+                    <div class="grid-2" style="margin-top: 1rem; margin-bottom: 0;">
+                        <div class="card stat-card">
+                            <label>Standard Deviation (&sigma;)</label>
+                            <div class="stat-formula">&radic;(1-p) / p</div>
+                            <div class="stat-value" id="geom-stat-std">1.4142</div>
+                        </div>
+                        <div class="card stat-card">
+                            <label>Second Moment E[X&sup2;]</label>
+                            <div class="stat-formula">(2-p) / p&sup2;</div>
+                            <div class="stat-value" id="geom-stat-m2">6.0000</div>
+                        </div>
+                    </div>
+                    <div class="card stat-card" style="margin-top: 1rem;">
+                        <label>Skewness (&gamma;&sub1;)</label>
+                        <div class="stat-formula">(2-p) / &radic;(1-p)</div>
+                        <div class="stat-value" id="geom-stat-skew">2.1213</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph Container -->
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3>Geometric PMF Visualization & Mean Reference</h3>
+                <p>Probability Mass Function showing trial numbers until the first success. The dashed line indicates the expected waiting time 1/p.</p>
+                <div class="chart-container" id="geom-chart-container">
+                    <svg class="chart" id="geom-svg"></svg>
+                    <div class="tooltip" id="geom-tooltip"></div>
+                </div>
+            </div>
+
+            <!-- Laboratory Exercise 3 -->
+            <div class="card" style="margin-top: 1.5rem; border-left: 4px solid var(--success);">
+                <h3>Laboratory Exercise 3: Geometric Analysis</h3>
+                <p>Test your understanding of waiting-time distributions with success probability p = 0.5.</p>
+                <button class="btn" id="load-ex3-btn" style="margin-bottom: 1rem;">Load Exercise 3 Values (p = 0.5)</button>
+                
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-muted);">
+                    <li><strong>Q1 Mean & Variance:</strong> Mean = 2, Variance = 2.</li>
+                    <li><strong>Q2 Exact Probability (k = 3):</strong> P(X = 3) = 0.125.</li>
+                    <li><strong>Q3 Cumulative Probability (k = 3):</strong> P(X &le; 3) = 0.875.</li>
+                    <li><strong>Q4 Graph Observation:</strong> Highest probability occurs at X = 1.</li>
+                </ul>
+
+                <div class="input-group">
+                    <label for="geom-inference"><strong>Q5 Student Inference / Observations:</strong></label>
+                    <textarea id="geom-inference" rows="3" placeholder="Enter inference notes here...">When the success probability is 0.5 on every independent trial, the first trial has the highest probability of success. The probability that the first success occurs on a later trial decreases geometrically, and the expected waiting time is two trials.</textarea>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>Discrete Probability Distributions AIML Laboratory &bull; Educational Web Application</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        /* --- Navigation Logic --- */
+        function switchView(targetId) {
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            const targetBtn = document.querySelector(`.nav-btn[data-target="${targetId}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Trigger redraws if necessary
+            setTimeout(renderAllCharts, 50);
+        }
+
+        document.querySelectorAll('.nav-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const target = e.target.getAttribute('data-target');
+                switchView(target);
+            });
+        });
+
+        /* --- Mathematical Utility Functions --- */
+        function factorial(n) {
+            if (n < 0) return 0;
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        function logFactorial(n) {
+            if (n < 0) return 0;
+            let sum = 0;
+            for (let i = 2; i <= n; i++) {
+                sum += Math.log(i);
+            }
+            return sum;
+        }
+
+        function combination(n, k) {
+            if (k < 0 || k > n) return 0;
+            if (k === 0 || k === n) return 1;
+            if (k > n / k) k = n - k;
+            
+            // Use logarithms for numerical stability with large factorials
+            let logComb = logFactorial(n) - logFactorial(k) - logFactorial(n - k);
+            return Math.exp(logComb);
+        }
+
+        /* --- Binomial Distribution Logic --- */
+        function binomialPMF(n, p, k) {
+            if (k < 0 || k > n) return 0;
+            if (p === 0) return k === 0 ? 1 : 0;
+            if (p === 1) return k === n ? 1 : 0;
+            let logProb = logFactorial(n) - logFactorial(k) - logFactorial(n - k) + 
+                          k * Math.log(p) + (n - k) * Math.log(1 - p);
+            return Math.exp(logProb);
+        }
+
+        function binomialCDF(n, p, k) {
+            let sum = 0;
+            let limit = Math.min(k, n);
+            for (let i = 0; i <= limit; i++) {
+                sum += binomialPMF(n, p, i);
+            }
+            return Math.min(1, Math.max(0, sum));
+        }
+
+        function updateBinomial() {
+            const nInput = document.getElementById('binom-n');
+            const pInput = document.getElementById('binom-p');
+            const kInput = document.getElementById('binom-k');
+            const cdfKInput = document.getElementById('binom-cdf-k');
+
+            const nErr = document.getElementById('binom-n-error');
+            const pErr = document.getElementById('binom-p-error');
+            const kErr = document.getElementById('binom-k-error');
+            const cdfKErr = document.getElementById('binom-cdf-k-error');
+
+            let n = parseInt(nInput.value);
+            let p = parseFloat(pInput.value);
+            let k = parseInt(kInput.value);
+            let cdfK = parseInt(cdfKInput.value);
+
+            let valid = true;
+
+            if (isNaN(n) || n <= 0 || n > 200) {
+                nErr.classList.add('visible');
+                valid = false;
+            } else {
+                nErr.classList.remove('visible');
+            }
+
+            if (isNaN(p) || p < 0 || p > 1) {
+                pErr.classList.add('visible');
+                valid = false;
+            } else {
+                pErr.classList.remove('visible');
+            }
+
+            if (!valid) return;
+
+            // Constrain k inputs based on n
+            if (isNaN(k) || k < 0 || k > n) {
+                kErr.classList.add('visible');
+                k = Math.min(Math.max(0, k), n);
+            } else {
+                kErr.classList.remove('visible');
+            }
+
+            if (isNaN(cdfK) || cdfK < 0 || cdfK > n) {
+                cdfKErr.classList.add('visible');
+                cdfK = Math.min(Math.max(0, cdfK), n);
+            } else {
+                cdfKErr.classList.remove('visible');
+            }
+
+            document.getElementById('binom-param-summary').innerText = `Selected: n = ${n}, p = ${p}, 1-p = ${(1-p).toFixed(4)}`;
+
+            // Statistics
+            const mean = n * p;
+            const variance = n * p * (1 - p);
+            const stdDev = Math.sqrt(variance);
+            const secondMoment = variance + (mean * mean);
+            let skewness = variance > 0 ? (1 - 2 * p) / stdDev : 0;
+
+            document.getElementById('binom-stat-mean').innerText = mean.toFixed(4);
+            document.getElementById('binom-stat-var').innerText = variance.toFixed(4);
+            document.getElementById('binom-stat-std').innerText = stdDev.toFixed(4);
+            document.getElementById('binom-stat-m2').innerText = secondMoment.toFixed(4);
+            document.getElementById('binom-stat-skew').innerText = variance > 0 ? skewness.toFixed(4) : "Undefined";
+
+            // PMF Calculator Result
+            const pmfVal = binomialPMF(n, p, k);
+            document.getElementById('binom-pmf-result').innerText = `P(X = ${k}) = ${pmfVal.toFixed(4)} (${(pmfVal * 100).toFixed(2)}%)`;
+
+            // CDF Calculator Result
+            const cdfVal = binomialCDF(n, p, cdfK);
+            const cCompVal = 1 - cdfVal;
+            document.getElementById('binom-cdf-result').innerText = `P(X \u2264 ${cdfK}) = ${cdfVal.toFixed(4)} (${(cdfVal * 100).toFixed(2)}%) | P(X > ${cdfK}) = ${cCompVal.toFixed(4)} (${(cCompVal * 100).toFixed(2)}%)`;
+
+            renderBarChart('binom-svg', 'binom-tooltip', n, (i) => binomialPMF(n, p, i), mean, 0, n);
+        }
+
+        /* --- Poisson Distribution Logic --- */
+        function poissonPMF(lambda, k) {
+            if (k < 0) return 0;
+            if (lambda === 0) return k === 0 ? 1 : 0;
+            let logProb = -lambda + k * Math.log(lambda) - logFactorial(k);
+            return Math.exp(logProb);
+        }
+
+        function poissonCDF(lambda, k) {
+            let sum = 0;
+            for (let i = 0; i <= k; i++) {
+                sum += poissonPMF(lambda, i);
+            }
+            return Math.min(1, sum);
+        }
+
+        function updatePoisson() {
+            const lambdaInput = document.getElementById('poisson-lambda');
+            const kInput = document.getElementById('poisson-k');
+            const cdfKInput = document.getElementById('poisson-cdf-k');
+
+            const lambdaErr = document.getElementById('poisson-lambda-error');
+            const kErr = document.getElementById('poisson-k-error');
+            const cdfKErr = document.getElementById('poisson-cdf-k-error');
+
+            let lambda = parseFloat(lambdaInput.value);
+            let k = parseInt(kInput.value);
+            let cdfK = parseInt(cdfKInput.value);
+
+            let valid = true;
+
+            if (isNaN(lambda) || lambda < 0) {
+                lambdaErr.classList.add('visible');
+                valid = false;
+            } else {
+                lambdaErr.classList.remove('visible');
+            }
+
+            if (!valid) return;
+
+            if (isNaN(k) || k < 0) {
+                kErr.classList.add('visible');
+                k = Math.max(0, k);
+            } else {
+                kErr.classList.remove('visible');
+            }
+
+            if (isNaN(cdfK) || cdfK < 0) {
+                cdfKErr.classList.add('visible');
+                cdfK = Math.max(0, cdfK);
+            } else {
+                cdfKErr.classList.remove('visible');
+            }
+
+            // Statistics
+            const mean = lambda;
+            const variance = lambda;
+            const stdDev = Math.sqrt(lambda);
+
+            document.getElementById('poisson-stat-mean').innerText = mean.toFixed(4);
+            document.getElementById('poisson-stat-var').innerText = variance.toFixed(4);
+            document.getElementById('poisson-stat-std').innerText = stdDev.toFixed(4);
+
+            // PMF Calculator
+            const pmfVal = poissonPMF(lambda, k);
+            document.getElementById('poisson-pmf-result').innerText = `P(X = ${k}) = ${pmfVal.toFixed(4)} (${(pmfVal * 100).toFixed(2)}%)`;
+
+            // CDF Calculator
+            const cdfVal = poissonCDF(lambda, cdfK);
+            const cCompVal = 1 - cdfVal;
+            document.getElementById('poisson-cdf-result').innerText = `P(X \u2264 ${cdfK}) = ${cdfVal.toFixed(4)} (${(cdfVal * 100).toFixed(2)}%) | P(X > ${cdfK}) = ${cCompVal.toFixed(4)} (${(cCompVal * 100).toFixed(2)}%)`;
+
+            // Plotting range for Poisson captures ~99.9% mass
+            const maxRange = Math.max(20, Math.ceil(lambda + 4 * stdDev));
+            renderBarChart('poisson-svg', 'poisson-tooltip', maxRange, (i) => poissonPMF(lambda, i), mean, 0, maxRange);
+            
+            // Poisson Comparison Graph (&lambda; = 2, 6, 10)
+            renderPoissonComparison();
+        }
+
+        function renderPoissonComparison() {
+            const svg = document.getElementById('poisson-comp-svg');
+            const tooltip = document.getElementById('poisson-comp-tooltip');
+            svg.innerHTML = '';
+
+            const lambdas = [2, 6, 10];
+            const colors = ['#2563eb', '#10b981', '#f59e0b'];
+            const maxRange = 25;
+
+            // Generate multi-series bar chart via SVG groups or circles/lines
+            const width = svg.clientWidth || 600;
+            const height = svg.clientHeight || 350;
+            const padding = 40;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+
+            let maxProb = 0;
+            const datasets = lambdas.map(lam => {
+                let data = [];
+                for (let i = 0; i <= maxRange; i++) {
+                    let p = poissonPMF(lam, i);
+                    if (p > maxProb) maxProb = p;
+                    data.push(p);
+                }
+                return data;
+            });
+
+            if (maxProb === 0) maxProb = 1;
+
+            // Axes
+            const axisColor = '#cbd5e1';
+            svg.innerHTML += `<line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="${axisColor}" stroke-width="1.5" />`;
+            svg.innerHTML += `<line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="${axisColor}" stroke-width="1.5" />`;
+
+            // Y-Axis labels
+            for (let i = 0; i <= 4; i++) {
+                let val = (maxProb * (4 - i) / 4).toFixed(2);
+                let y = padding + (chartHeight * i / 4);
+                svg.innerHTML += `<text x="${padding - 8}" y="${y + 4}" font-size="10" fill="#64748b" text-anchor="end">${val}</text>`;
+                svg.innerHTML += `<line x1="${padding - 4}" y1="${y}" x2="${padding}" y2="${y}" stroke="${axisColor}" />`;
+            }
+
+            const barGroupWidth = chartWidth / (maxRange + 1);
+
+            for (let i = 0; i <= maxRange; i++) {
+                let xCenter = padding + i * barGroupWidth + barGroupWidth / 2;
+                
+                // X-axis tick every 5 units
+                if (i % 5 === 0) {
+                    svg.innerHTML += `<text x="${xCenter}" y="${height - padding + 15}" font-size="10" fill="#64748b" text-anchor="middle">${i}</text>`;
+                }
+
+                lambdas.forEach((lam, idx) => {
+                    let prob = datasets[idx][i];
+                    let barH = (prob / maxProb) * chartHeight;
+                    let barW = barGroupWidth / 3.5;
+                    let xBar = padding + i * barGroupWidth + (idx * barW) + 2;
+                    let yBar = height - padding - barH;
+
+                    let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                    rect.setAttribute("x", xBar);
+                    rect.setAttribute("y", yBar);
+                    rect.setAttribute("width", Math.max(1, barW - 1));
+                    rect.setAttribute("height", Math.max(0, barH));
+                    rect.setAttribute("fill", colors[idx]);
+                    rect.setAttribute("opacity", "0.75");
+
+                    rect.addEventListener('mouseenter', () => {
+                        tooltip.style.display = 'block';
+                        tooltip.innerHTML = `&lambda; = ${lam}, X = ${i}<br>P(X = ${i}) = ${prob.toFixed(4)}`;
+                    });
+                    rect.addEventListener('mousemove', (e) => {
+                        tooltip.style.left = (e.pageX + 10) + 'px';
+                        tooltip.style.top = (e.pageY - 30) + 'px';
+                    });
+                    rect.addEventListener('mouseleave', () => {
+                        tooltip.style.display = 'none';
+                    });
+
+                    svg.appendChild(rect);
+                });
+            }
+
+            // Legend
+            lambdas.forEach((lam, idx) => {
+                let lx = width - 100;
+                let ly = padding + idx * 20;
+                let rect = `<rect x="${lx}" y="${ly}" width="12" height="12" fill="${colors[idx]}" />`;
+                let text = `<text x="${lx + 18}" y="${ly + 10}" font-size="11" fill="#334155">&lambda; = ${lam}</text>`;
+                svg.innerHTML += rect + text;
+            });
+        }
+
+        /* --- Geometric Distribution Logic --- */
+        function geometricPMF(p, k) {
+            if (k < 1) return 0;
+            if (p === 1) return k === 1 ? 1 : 0;
+            return Math.pow(1 - p, k - 1) * p;
+        }
+
+        function geometricCDF(p, k) {
+            if (k < 1) return 0;
+            if (p === 1) return 1;
+            return 1 - Math.pow(1 - p, k);
+        }
+
+        function updateGeometric() {
+            const pInput = document.getElementById('geom-p');
+            const kInput = document.getElementById('geom-k');
+            const cdfKInput = document.getElementById('geom-cdf-k');
+
+            const pErr = document.getElementById('geom-p-error');
+            const kErr = document.getElementById('geom-k-error');
+            const cdfKErr = document.getElementById('geom-cdf-k-error');
+
+            let p = parseFloat(pInput.value);
+            let k = parseInt(kInput.value);
+            let cdfK = parseInt(cdfKInput.value);
+
+            let valid = true;
+
+            if (isNaN(p) || p <= 0 || p > 1) {
+                pErr.classList.add('visible');
+                valid = false;
+            } else {
+                pErr.classList.remove('visible');
+            }
+
+            if (!valid) return;
+
+            if (isNaN(k) || k < 1) {
+                kErr.classList.add('visible');
+                k = Math.max(1, k);
+            } else {
+                kErr.classList.remove('visible');
+            }
+
+            if (isNaN(cdfK) || cdfK < 1) {
+                cdfKErr.classList.add('visible');
+                cdfK = Math.max(1, cdfK);
+            } else {
+                cdfKErr.classList.remove('visible');
+            }
+
+            document.getElementById('geom-param-summary').innerText = `Selected: p = ${p}, 1-p = ${(1-p).toFixed(4)}`;
+
+            // Statistics
+            const mean = 1 / p;
+            const variance = (1 - p) / (p * p);
+            const stdDev = Math.sqrt(1 - p) / p;
+            const secondMoment = (2 - p) / (p * p);
+            let skewness = p < 1 ? (2 - p) / Math.sqrt(1 - p) : 0;
+
+            document.getElementById('geom-stat-mean').innerText = mean.toFixed(4);
+            document.getElementById('geom-stat-var').innerText = variance.toFixed(4);
+            document.getElementById('geom-stat-std').innerText = stdDev.toFixed(4);
+            document.getElementById('geom-stat-m2').innerText = secondMoment.toFixed(4);
+            document.getElementById('geom-stat-skew').innerText = p < 1 ? skewness.toFixed(4) : "Undefined";
+
+            // PMF Calculator
+            const pmfVal = geometricPMF(p, k);
+            document.getElementById('geom-pmf-result').innerText = `P(X = ${k}) = ${pmfVal.toFixed(4)} (${(pmfVal * 100).toFixed(2)}%)`;
+
+            // CDF Calculator
+            const cdfVal = geometricCDF(p, cdfK);
+            const cCompVal = 1 - cdfVal;
+            document.getElementById('geom-cdf-result').innerText = `P(X \u2264 ${cdfK}) = ${cdfVal.toFixed(4)} (${(cdfVal * 100).toFixed(2)}%) | P(X > ${cdfK}) = ${cCompVal.toFixed(4)} (${(cCompVal * 100).toFixed(2)}%)`;
+
+            // Plotting range for Geometric captures ~99.5% mass
+            let maxRange = Math.max(15, Math.ceil(mean + 4 * stdDev));
+            renderBarChart('geom-svg', 'geom-tooltip', maxRange, (i) => geometricPMF(p, i), mean, 1, maxRange);
+        }
+
+        /* --- Generic Interactive SVG Bar Chart Engine --- */
+        function renderBarChart(svgId, tooltipId, maxRange, pmfFunc, meanVal, startX, endX) {
+            const svg = document.getElementById(svgId);
+            const tooltip = document.getElementById(tooltipId);
+            svg.innerHTML = '';
+
+            const width = svg.clientWidth || 600;
+            const height = svg.clientHeight || 350;
+            const padding = 40;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+
+            let maxProb = 0;
+            let dataPoints = [];
+            for (let i = startX; i <= endX; i++) {
+                let prob = pmfFunc(i);
+                dataPoints.push({ x: i, prob: prob });
+                if (prob > maxProb) maxProb = prob;
+            }
+
+            if (maxProb === 0) maxProb = 1;
+
+            // Axis lines
+            const axisColor = '#cbd5e1';
+            svg.innerHTML += `<line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="${axisColor}" stroke-width="1.5" />`;
+            svg.innerHTML += `<line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="${axisColor}" stroke-width="1.5" />`;
+
+            // Y-Axis labels & gridlines
+            for (let i = 0; i <= 4; i++) {
+                let val = (maxProb * (4 - i) / 4).toFixed(2);
+                let y = padding + (chartHeight * i / 4);
+                svg.innerHTML += `<text x="${padding - 8}" y="${y + 4}" font-size="10" fill="#64748b" text-anchor="end">${val}</text>`;
+                svg.innerHTML += `<line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="#f1f5f9" stroke-dasharray="3,3" />`;
+            }
+
+            const totalBars = dataPoints.length;
+            const barWidth = Math.max(2, chartWidth / totalBars - 2);
+
+            dataPoints.forEach((pt, idx) => {
+                let barH = (pt.prob / maxProb) * chartHeight;
+                let xBar = padding + idx * (chartWidth / totalBars) + 1;
+                let yBar = height - padding - barH;
+
+                let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rect.setAttribute("x", xBar);
+                rect.setAttribute("y", yBar);
+                rect.setAttribute("width", barWidth);
+                rect.setAttribute("height", Math.max(0, barH));
+                rect.setAttribute("fill", "#2563eb");
+                rect.setAttribute("rx", "2");
+
+                rect.addEventListener('mouseenter', () => {
+                    rect.setAttribute("fill", "#1d4ed8");
+                    tooltip.style.display = 'block';
+                    tooltip.innerHTML = `X = ${pt.x}<br>P(X = ${pt.x}) = ${pt.prob.toFixed(4)}`;
+                });
+                rect.addEventListener('mousemove', (e) => {
+                    tooltip.style.left = (e.pageX + 10) + 'px';
+                    tooltip.style.top = (e.pageY - 30) + 'px';
+                });
+                rect.addEventListener('mouseleave', () => {
+                    rect.setAttribute("fill", "#2563eb");
+                    tooltip.style.display = 'none';
+                });
+
+                svg.appendChild(rect);
+
+                // X-axis tick labels for subset of values
+                if (totalBars <= 25 || idx % Math.ceil(totalBars / 10) === 0 || idx === totalBars - 1) {
+                    svg.innerHTML += `<text x="${xBar + barWidth / 2}" y="${height - padding + 15}" font-size="10" fill="#64748b" text-anchor="middle">${pt.x}</text>`;
+                }
+            });
+
+            // Mean Reference Line
+            if (meanVal >= startX && meanVal <= endX) {
+                let meanXFraction = (meanVal - startX) / (endX - startX || 1);
+                let meanXPos = padding + meanXFraction * chartWidth;
+
+                let meanLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                meanLine.setAttribute("x1", meanXPos);
+                meanLine.setAttribute("y1", padding);
+                meanLine.setAttribute("x2", meanXPos);
+                meanLine.setAttribute("y2", height - padding);
+                meanLine.setAttribute("stroke", "#ef4444");
+                meanLine.setAttribute("stroke-width", "2");
+                meanLine.setAttribute("stroke-dasharray", "4,4");
+                svg.appendChild(meanLine);
+
+                let meanText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                meanText.setAttribute("x", meanXPos + 5);
+                meanText.setAttribute("y", padding + 15);
+                meanText.setAttribute("font-size", "11");
+                meanText.setAttribute("fill", "#ef4444");
+                meanText.setAttribute("font-weight", "600");
+                meanText.textContent = `Mean = ${meanVal.toFixed(2)}`;
+                svg.appendChild(meanText);
+            }
+        }
+
+        function renderAllCharts() {
+            updateBinomial();
+            updatePoisson();
+            updateGeometric();
+        }
+
+        /* --- Laboratory Exercises Quick Loaders --- */
+        document.getElementById('load-ex1-btn').addEventListener('click', () => {
+            document.getElementById('binom-n').value = 15;
+            document.getElementById('binom-p').value = 0.6;
+            document.getElementById('binom-k').value = 9;
+            document.getElementById('binom-cdf-k').value = 10;
+            updateBinomial();
+        });
+
+        document.getElementById('load-ex2-btn').addEventListener('click', () => {
+            document.getElementById('poisson-lambda').value = 6;
+            document.getElementById('poisson-k').value = 8;
+            document.getElementById('poisson-cdf-k').value = 5;
+            updatePoisson();
+        });
+
+        document.getElementById('load-ex3-btn').addEventListener('click', () => {
+            document.getElementById('geom-p').value = 0.5;
+            document.getElementById('geom-k').value = 3;
+            document.getElementById('geom-cdf-k').value = 3;
+            updateGeometric();
+        });
+
+        /* --- Event Listeners for Input Updates --- */
+        ['binom-n', 'binom-p', 'binom-k', 'binom-cdf-k'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateBinomial);
+        });
+
+        ['poisson-lambda', 'poisson-k', 'poisson-cdf-k'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updatePoisson);
+        });
+
+        ['geom-p', 'geom-k', 'geom-cdf-k'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateGeometric);
+        });
+
+        // Initial render on load
+        window.addEventListener('load', () => {
+            renderAllCharts();
+        });
+        window.addEventListener('resize', () => {
+            renderAllCharts();
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
